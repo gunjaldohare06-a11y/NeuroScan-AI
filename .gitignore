@@ -5,3 +5,4 @@ __pycache__/
 static/uploads/*
 .vscode/
 dataset/
+model/brain_tumor_model.keras
