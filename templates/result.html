@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NeuroScan AI | Analysis Result</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .navbar {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #e6ebf2;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+
+            border-radius: 11px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(135deg, #087cff, #00b8d9);
+
+            color: white;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #087cff;
+        }
+
+        .back {
+            text-decoration: none;
+            color: #087cff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: auto;
+
+            padding: 40px 0;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .heading p {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .result-card {
+            background: white;
+
+            border: 1px solid #e5eaf0;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 8px 30px rgba(20, 40, 70, 0.06);
+        }
+
+        .result-header {
+            padding: 20px 25px;
+
+            border-bottom: 1px solid #edf1f5;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-header h3 {
+            font-size: 16px;
+        }
+
+        .status {
+            color: #079455;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+
+            padding: 30px;
+        }
+
+        .image-section h4,
+        .prediction-section h4 {
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .image-box {
+            width: 100%;
+            height: 360px;
+
+            border-radius: 15px;
+
+            background: #101820;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+        }
+
+        .prediction-box {
+            border: 1px solid #e5eaf0;
+
+            border-radius: 15px;
+
+            padding: 25px;
+
+            background: #fbfcfe;
+        }
+
+        .label {
+            color: #98a2b3;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 7px;
+        }
+
+        .prediction {
+            font-size: 30px;
+
+            font-weight: 700;
+
+            color: #087cff;
+
+            margin-bottom: 25px;
+        }
+
+        .confidence-header {
+            display: flex;
+            justify-content: space-between;
+
+            font-size: 12px;
+
+            margin-bottom: 8px;
+        }
+
+        .confidence-value {
+            color: #087cff;
+            font-weight: 700;
+        }
+
+        .progress {
+            width: 100%;
+            height: 10px;
+
+            background: #e7edf4;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+    height: 100%;
+    width: {{ confidence }}%;
+    background: linear-gradient(90deg, #087cff, #00b8d9);
+    border-radius: 20px;
+}
+
+        }
+
+        .info {
+            border-top: 1px solid #e5eaf0;
+
+            padding-top: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+
+            padding: 9px 0;
+
+            font-size: 12px;
+        }
+
+        .info-row span:first-child {
+            color: #98a2b3;
+        }
+
+        .info-row span:last-child {
+            font-weight: 600;
+        }
+
+        .warning {
+            margin-top: 20px;
+
+            padding: 12px 14px;
+
+            border-radius: 9px;
+
+            background: #fff8e7;
+
+            color: #9a6700;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
+
+            padding: 13px;
+
+            border-radius: 9px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #087cff;
+            color: white;
+        }
+
+        .secondary {
+            background: white;
+
+            color: #087cff;
+
+            border: 1px solid #087cff;
+        }
+
+        footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #98a2b3;
+
+            font-size: 10px;
+        }
+
+        @media(max-width: 750px) {
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .image-box {
+                height: 280px;
+            }
+
+            .prediction {
+                font-size: 25px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                N
+            </div>
+
+            NeuroScan <span>AI</span>
+
+        </div>
+
+        <a href="/dashboard" class="back">
+            ← Back to Dashboard
+        </a>
+
+    </nav>
+
+
+    <main class="container">
+
+        <div class="heading">
+
+            <h1>
+                MRI Analysis Result
+            </h1>
+
+            <p>
+                Your brain MRI has been analyzed by the NeuroScan AI model.
+            </p>
+
+        </div>
+
+
+        <section class="result-card">
+
+            <div class="result-header">
+
+                <h3>
+                    AI Classification Report
+                </h3>
+
+                <div class="status">
+                    ● Analysis Complete
+                </div>
+
+            </div>
+
+
+            <div class="content">
+
+
+                <!-- MRI IMAGE -->
+
+                <div class="image-section">
+
+                    <h4>
+                        Uploaded MRI Scan
+                    </h4>
+
+                    <div class="image-box">
+
+                        <img
+                            src="/{{ image_path }}"
+                            alt="Uploaded MRI Scan">
+
+                    </div>
+
+                </div>
+
+
+                <!-- RESULT -->
+
+                <div class="prediction-section">
+
+                    <h4>
+                        AI Prediction
+                    </h4>
+
+                    <div class="prediction-box">
+
+                        <div class="label">
+                            Predicted Condition
+                        </div>
+
+                        <div class="prediction">
+                            {{ prediction }}
+                        </div>
+
+
+                        <div class="confidence-header">
+
+                            <span>
+                                Model Confidence
+                            </span>
+
+                            <span class="confidence-value">
+                                {{ confidence }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress">
+
+                            <div class="progress-bar"></div>
+
+                        </div>
+                        <div class="probability-title">
+    Prediction Probability
+</div>
+
+<!-- GLIOMA -->
+<div class="probability-item">
+
+    <div class="probability-header">
+        <span>Glioma</span>
+
+        <strong>
+            {{ probabilities['Glioma'] }}%
+        </strong>
+    </div>
+
+    <div class="probability-track">
+        <div
+            class="probability-fill"
+            style="width: {{ probabilities['Glioma'] }}%;">
+        </div>
+    </div>
+
+</div>
+
+
+<!-- MENINGIOMA -->
+<div class="probability-item">
+
+    <div class="probability-header">
+        <span>Meningioma</span>
+
+        <strong>
+            {{ probabilities['Meningioma'] }}%
+        </strong>
+    </div>
+
+    <div class="probability-track">
+        <div
+            class="probability-fill"
+            style="width: {{ probabilities['Meningioma'] }}%;">
+        </div>
+    </div>
+
+</div>
+
+
+<!-- NO TUMOR -->
+<div class="probability-item">
+
+    <div class="probability-header">
+        <span>No Tumor</span>
+
+        <strong>
+            {{ probabilities['No Tumor'] }}%
+        </strong>
+    </div>
+
+    <div class="probability-track">
+        <div
+            class="probability-fill"
+            style="width: {{ probabilities['No Tumor'] }}%;">
+        </div>
+    </div>
+
+</div>
+
+
+<!-- PITUITARY -->
+<div class="probability-item">
+
+    <div class="probability-header">
+        <span>Pituitary</span>
+
+        <strong>
+            {{ probabilities['Pituitary'] }}%
+        </strong>
+    </div>
+
+    <div class="probability-track">
+        <div
+            class="probability-fill"
+            style="width: {{ probabilities['Pituitary'] }}%;">
+        </div>
+    </div>
+
+</div>
+
+                        <div class="info">
+
+                            <div class="info-row">
+
+                                <span>
+                                    Model
+                                </span>
+
+                                <span>
+                                    CNN
+                                </span>
+
+                            </div>
+
+                            <div class="info-row">
+
+                                <span>
+                                    Framework
+                                </span>
+
+                                <span>
+                                    TensorFlow
+                                </span>
+
+                            </div>
+
+                            <div class="info-row">
+
+                                <span>
+                                    Classes
+                                </span>
+
+                                <span>
+                                    4
+                                </span>
+
+                            </div>
+
+                            <div class="info-row">
+
+                                <span>
+                                    Input Size
+                                </span>
+
+                                <span>
+                                    224 × 224
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="warning">
+
+                            ⚠️ This result is generated by an AI
+                            model for educational/research purposes.
+                            It should not be considered a medical diagnosis.
+
+                        </div>
+
+
+                        <div class="buttons">
+
+                            <a
+                                href="/dashboard"
+                                class="btn primary">
+
+                                Analyze Another MRI
+
+                            </a>
+
+                            <a
+                                href="/dashboard"
+                                class="btn secondary">
+
+                                Dashboard
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            NeuroScan AI • Brain MRI Classification System
+        </footer>
+
+    </main>
+
+</body>
+
+</html>
