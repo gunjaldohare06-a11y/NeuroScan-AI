@@ -1,11 +1,14 @@
 import os
+
+# Disable GPU for Render
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 from flask import Flask, render_template, request
-import tensorflow as tf
 import numpy as np
 from PIL import Image
 import uuid
+import tensorflow as tf
+
 
 # ==========================================
 # FLASK APP
@@ -18,7 +21,7 @@ app = Flask(__name__)
 # CONFIGURATION
 # ==========================================
 
-MODEL_PATH = "model/brain_tumor_model.keras"
+MODEL_PATH = "model/brain_tumor_model.tflite"
 UPLOAD_FOLDER = "static/uploads"
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -27,14 +30,21 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # ==========================================
-# LOAD TRAINED MODEL
+# LOAD TRAINED TFLITE MODEL
 # ==========================================
 
-print("Loading NeuroScan AI model...")
+print("Loading NeuroScan AI TFLite model...")
 
-model = tf.keras.models.load_model(MODEL_PATH)
+interpreter = tf.lite.Interpreter(
+    model_path=MODEL_PATH
+)
 
-print("Model loaded successfully!")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+print("TFLite model loaded successfully!")
 
 
 # ==========================================
@@ -122,12 +132,18 @@ def predict():
 
 
     # ======================================
-    # MODEL PREDICTION
+    # TFLITE MODEL PREDICTION
     # ======================================
 
-    predictions = model.predict(
-        image_array,
-        verbose=0
+    interpreter.set_tensor(
+        input_details[0]["index"],
+        image_array.astype(np.float32)
+    )
+
+    interpreter.invoke()
+
+    predictions = interpreter.get_tensor(
+        output_details[0]["index"]
     )
 
 
@@ -173,4 +189,10 @@ def predict():
 # ==========================================
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    )
